@@ -43,10 +43,10 @@ jobs:
         run: npm install
 
       - name: Test Lint
-        run: npm lint
+        run: npm run lint
 
       - name: Test Cases
-        run: npm test
+        run: npm run test
 
       - name: Generate Staging Build
         if: github.ref == 'refs/head/staging'
