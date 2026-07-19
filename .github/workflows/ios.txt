@@ -1,8 +1,8 @@
 name: iOS CI
 
 on:
-  branches:
-    push:
+  push:
+    branches:
       - staging
       - main
 
