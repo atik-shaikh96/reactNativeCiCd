@@ -38,12 +38,15 @@ This repository includes custom configuration pipelines located in `android/fast
 
 First, you will need to run **Metro**, the JavaScript build tool for React Native. Run the following command from the root directory:
 
-`````sh
+```sh
 # Using npm
 npm start
 
 # OR using Yarn
-yarn start# React Native Native Engine: CI/CD & Fastlane Automation Template
+yarn start
+```
+
+# React Native Native Engine: CI/CD & Fastlane Automation Template
 
 This repository serves exclusively as a production-grade orchestration framework for automating the compilation, signing, and store delivery pipelines of a cross-platform React Native codebase. By encapsulating automated toolchains within platform-agnostic configuration directories (`android/fastlane/` and `ios/fastlane/`), it abstracts away manual execution of native building engines (`xcodebuild` and `gradlew`).
 
@@ -53,7 +56,7 @@ This repository serves exclusively as a production-grade orchestration framework
 
 The project is structured to keep native build orchestration clear and separation of concerns high. Deep implementation logic, raw scripts, and operational runbooks are modularly split into the `docs/` workspace:
 
-````text
+```text
 ├── docs/
 │   ├── 01-environment-setup.md      # Local system variables, Ruby Bundler layers, and CI environments
 │   ├── 02-native-configuration.md   # Android keystore hooks, build flavors, and iOS bundle provisioning
@@ -62,7 +65,7 @@ The project is structured to keep native build orchestration clear and separatio
 │   └── fastlane/                    # Appfile, Fastfile, and automated execution lanes for Android
 └── ios/
     └── fastlane/                    # Appfile, Fastfile, and automated execution lanes for iOS
-`````
+```
 
 ---
 
@@ -189,3 +192,15 @@ For comprehensive guidance regarding pipeline setup, step-by-step token recovery
 >   | **iOS** | `fastlane staging` | `build_app(scheme: "reactNativeCiCd")` | Local Staging IPA |
 >   | | `fastlane production` | `build_app(scheme: "reactNativeCi")` | Apple TestFlight (Hands-Free Delivery) |
 > - Pointers to the [docs/03-fastlane-automation.md](docs/03-fastlane-automation.md) for _step-by-step_ Fastlane and CI/CD usage details.
+
+---
+
+## 🎓 Credits & Acknowledgments
+
+This advanced automation structure and native CI/CD deployment blueprint were heavily inspired by and developed utilizing the technical insights from the React Native Team Lead architectural series:
+
+- **Instructor:** Ritik Prasad
+
+- **Reference Course:** [Master CI CD React Native | Advanced Concepts | EP 07](https://www.youtube.com/watch?v=JbEzhRG3aYs&t=1s)
+
+Special thanks for breaking down ground-reality DevOps engineering practices, multi-environment branch mechanics, and automated store integration strategies for mobile production applications.
