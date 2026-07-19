@@ -31,8 +31,14 @@ jobs:
           path: ~/.npm
           key: ${{ runner.os }}-node-{{ hashFiles('package-lock.json') }}
 
+      - name: Setup Ruby Engine
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
       - name: Install Fastlane
-        run: gem install fastlane --no-document
+        run: sudo gem install fastlane --no-document
 
       - name: Install dependencies
         run: npm install
