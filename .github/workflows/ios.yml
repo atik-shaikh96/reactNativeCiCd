@@ -1,0 +1,83 @@
+name: iOS CI
+
+on:
+  branches:
+    push:
+      - staging
+      - main
+
+jobs:
+  ios-build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Pod install
+        run: |
+          cd ios
+          pod install
+
+      - name: Fastlane Install
+        run: gem install fastlane
+
+      - name: Test Cases
+        run: npm test
+
+      - name: Staging IPA build
+        if: github.ref == 'refs/head/staging'
+        run: |
+          cd ios
+          # xcodebuild command to build the iOS app for release
+          #
+          # Breakdown:
+          # xcodebuild                             - Xcode CLI to build your project.
+          # -workspace reactNativeCiCd.xcworkspace         - Use the workspace file (replace YourApp with your Xcode workspace name).
+          # -scheme reactNativeCiCd                        - The scheme to build (replace with your app's scheme name, usually matches your app name).
+          # -configuration Release                 - Choose Release build configuration for a production/staged IPA.
+          # -sdk iphoneos                          - Target the iOS SDK (device build, not simulator).
+          # -allowProvisioningUpdates              - Automatically manage code signing and update profiles if needed during build.
+          #
+          # Example: If your app is called ExampleApp, use "-workspace ExampleApp.xcworkspace -scheme ExampleApp"
+          xcodebuild -workspace reactNativeCiCd.xcworkspace -scheme reactNativeCiCd -configuration Release -sdk iphoneos -allowProvisioningUpdates
+
+      # - name: Staging IPA build with fastlane
+      #   if: github.ref == 'refs/head/staging'
+      #   run: |
+      #     cd ios
+      #     fastlane ios
+
+      # - name: Create Production Environment
+      #   if: github.ref == 'refs/head/main'
+      #   run: |
+      #     echo "${{ secrets.ENV_PROD }}" > .env.prod
+
+      # - name: Setup Appstore API keys
+      #   if: github.ref == 'refs/head/main'
+      #   run: |
+      #     echo "${{ secrets.APPSTORE_API_KEY }}" > ios/Appstore.p8
+
+      # - name: Create Production Build
+      #   if: github.ref == 'refs/head/main'
+      #   env:
+      #     APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+      #     APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+      #   run: |
+      #     cd ios
+      #     ENVFILE=.env.prod fastlane production
+
+      - name: Stating IPA upload
+        if: github.ref == 'refs/head/staging'
+        uses: actions/upload-artifacts@v4
+        with:
+          name: staging-ipa
+          path: ios/*.ipa

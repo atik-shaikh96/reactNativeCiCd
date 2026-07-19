@@ -1,0 +1,79 @@
+name: Android CI
+
+on:
+  push:
+    branches:
+      - staging
+      - main
+
+jobs:
+  android-build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Cache setup
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-{{ hashFiles('package-lock.json') }}
+
+      - name: Install Fastlane
+        run: gem install fastlane
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Test Lint
+        run: npm lint
+
+      - name: Test Cases
+        run: npm test
+
+      - name: Generate Staging Build
+        if: github.ref == 'refs/head/staging'
+        run: |
+          cd android
+          ./gradlew assembleRelease
+
+      # - name: Production Playstore setup
+      #   if: github.ref == 'refs/head/main'
+      #   run: |
+      #     echo '${{ secrets.PLAYSTORE_JSON }}' > android/playstore.json
+
+      # - name: Generate Production build
+      #   if: github.ref == 'refs/head/main'
+      #   run: |
+      #     cd android
+      #     ENVFILE=.env.prod fastlane production
+
+      # - name: Generate Staging build with fastlane
+      #   if: github.ref == 'refs/head/staging'
+      #   run: fastlane staging
+
+      - name: Upload Staging Artifacts
+        if: github.ref == 'refs/head/staging'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload Production Release Artifacts
+        if: github.ref == 'ref/head/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-bundle
+          path: android/app/build/outputs/aab/release/app-bundle.aab
