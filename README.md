@@ -203,4 +203,4 @@ This advanced automation structure and native CI/CD deployment blueprint were he
 
 - **Reference Course:** [Master CI CD React Native | Advanced Concepts | EP 07](https://www.youtube.com/watch?v=JbEzhRG3aYs&t=1s)
 
-Special thanks for breaking down ground-reality DevOps engineering practices, multi-environment branch mechanics, and automated store integration strategies for mobile production applications.
+Special thanks for breaking down the hands-on mechanics of mobile CI/CD pipelines, Fastlane asset orchestration (Keystore/Play Console JSON linkages), and automated store upload routines.
