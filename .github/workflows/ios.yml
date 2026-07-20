@@ -28,6 +28,16 @@ jobs:
         with:
           ruby-version: '3.2'
 
+      - name: Setup Cache CocoaPods
+        uses: actions/cache@v4
+        with:
+          path: |
+            ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: ${{ runner.os }}-pods-${{ hashFiles('package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-pods-
+
       - name: Install CocoaPods
         run: gem install cocoapods --no-document
 
@@ -75,7 +85,8 @@ jobs:
         if: github.ref == 'refs/heads/main'
         run: |
           cd ios
-          xcodebuild -exportArchive \
+           xcodebuild \
+            -exportArchive \
             -archivePath build/reactNativeCiCd.xcarchive \
             -exportPath build/exported \
             -exportOptionsPlist ExportOptions.plist \
