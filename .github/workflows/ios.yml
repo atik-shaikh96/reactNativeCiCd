@@ -55,84 +55,98 @@ jobs:
       # - name: Test Cases
       #   run: npm run test
 
-      # ========== Without Fastlane ====================
-      # 1. Compile the code into an Xcode Archive (.xcarchive)
-      - name: Archive iOS App (Staging)
+      # ========= Validate Build ================
+
+      - name: Verify iOS Release Build
         if: github.ref == 'refs/heads/main'
         run: |
           cd ios
-          # xcodebuild command to build the iOS app for release
-          #
-          # Breakdown:
-          # xcodebuild                             - Xcode CLI to build your project.
-          # -workspace reactNativeCiCd.xcworkspace         - Use the workspace file (replace YourApp with your Xcode workspace name).
-          # -scheme reactNativeCiCd                        - The scheme to build (replace with your app's scheme name, usually matches your app name).
-          # -configuration Release                 - Choose Release build configuration for a production/staged IPA.
-          # -sdk iphoneos                          - Target the iOS SDK (device build, not simulator).
-          # -allowProvisioningUpdates              - Automatically manage code signing and update profiles if needed during build.
-          #
-          # Example: If your app is called ExampleApp, use "-workspace ExampleApp.xcworkspace -scheme ExampleApp"
-          xcodebuild archive \
+
+          xcodebuild \
             -workspace reactNativeCiCd.xcworkspace \
             -scheme reactNativeCiCd \
             -configuration Release \
             -destination "generic/platform=iOS" \
-            -archivePath build/reactNativeCiCd.xcarchive \
-            -allowProvisioningUpdates
+            clean build
 
-      # 2. Package the Archive into a distribution-ready .ipa file
-      - name: Export IPA from Archive (Staging)
-        if: github.ref == 'refs/heads/main'
-        run: |
-          cd ios
-           xcodebuild \
-            -exportArchive \
-            -archivePath build/reactNativeCiCd.xcarchive \
-            -exportPath build/exported \
-            -exportOptionsPlist ExportOptions.plist \
-            -allowProvisioningUpdates
-
-      # 3. Securely upload the exported .ipa to App Store Connect / TestFlight
-      # - name: Upload IPA to TestFlight (Staging)
-      #   if: github.ref == 'refs/heads/main'
-      #   run: |
-      #     xcrun altool --upload-app \
-      #       --type ios \
-      #       --file ios/build/exported/reactNativeCiCd.ipa \
-      #       --apiKey "${{ secrets.APPSTORE_KEY_ID }}" \
-      #       --apiIssuer "${{ secrets.APPSTORE_ISSUER_ID }}"
-
-      # =========== With Fastlane Setup ====================
-
-      # - name: Staging IPA build with fastlane
+      # # ========== Without Fastlane ====================
+      # # 1. Compile the code into an Xcode Archive (.xcarchive)
+      # - name: Archive iOS App (Staging)
       #   if: github.ref == 'refs/heads/main'
       #   run: |
       #     cd ios
-      #     fastlane ios
+      #     # xcodebuild command to build the iOS app for release
+      #     #
+      #     # Breakdown:
+      #     # xcodebuild                             - Xcode CLI to build your project.
+      #     # -workspace reactNativeCiCd.xcworkspace         - Use the workspace file (replace YourApp with your Xcode workspace name).
+      #     # -scheme reactNativeCiCd                        - The scheme to build (replace with your app's scheme name, usually matches your app name).
+      #     # -configuration Release                 - Choose Release build configuration for a production/staged IPA.
+      #     # -sdk iphoneos                          - Target the iOS SDK (device build, not simulator).
+      #     # -allowProvisioningUpdates              - Automatically manage code signing and update profiles if needed during build.
+      #     #
+      #     # Example: If your app is called ExampleApp, use "-workspace ExampleApp.xcworkspace -scheme ExampleApp"
+      #     xcodebuild archive \
+      #       -workspace reactNativeCiCd.xcworkspace \
+      #       -scheme reactNativeCiCd \
+      #       -configuration Release \
+      #       -destination "generic/platform=iOS" \
+      #       -archivePath build/reactNativeCiCd.xcarchive \
+      #       -allowProvisioningUpdates
 
-      # - name: Create Production Environment
-      #   if: github.ref == 'refs/heads/prod'
-      #   run: |
-      #     echo "${{ secrets.ENV_PROD }}" > .env.prod
-
-      # - name: Setup Appstore API keys
-      #   if: github.ref == 'refs/heads/prod'
-      #   run: |
-      #     echo "${{ secrets.APPSTORE_API_KEY }}" > ios/Appstore.p8
-
-      # - name: Create Production Build
-      #   if: github.ref == 'refs/heads/prod'
-      #   env:
-      #     APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
-      #     APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+      # # 2. Package the Archive into a distribution-ready .ipa file
+      # - name: Export IPA from Archive (Staging)
+      #   if: github.ref == 'refs/heads/main'
       #   run: |
       #     cd ios
-      #     ENVFILE=.env.prod fastlane production
+      #      xcodebuild \
+      #       -exportArchive \
+      #       -archivePath build/reactNativeCiCd.xcarchive \
+      #       -exportPath build/exported \
+      #       -exportOptionsPlist ExportOptions.plist \
+      #       -allowProvisioningUpdates
 
-      # --- ARTIFACT UPLOAD (Backup to download the raw file from GitHub) ---
-      - name: Stating IPA upload
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
-        with:
-          name: staging-ipa
-          path: ios/build/exported/*.ipa
+      # # 3. Securely upload the exported .ipa to App Store Connect / TestFlight
+      # # - name: Upload IPA to TestFlight (Staging)
+      # #   if: github.ref == 'refs/heads/main'
+      # #   run: |
+      # #     xcrun altool --upload-app \
+      # #       --type ios \
+      # #       --file ios/build/exported/reactNativeCiCd.ipa \
+      # #       --apiKey "${{ secrets.APPSTORE_KEY_ID }}" \
+      # #       --apiIssuer "${{ secrets.APPSTORE_ISSUER_ID }}"
+
+      # # =========== With Fastlane Setup ====================
+
+      # # - name: Staging IPA build with fastlane
+      # #   if: github.ref == 'refs/heads/main'
+      # #   run: |
+      # #     cd ios
+      # #     fastlane ios
+
+      # # - name: Create Production Environment
+      # #   if: github.ref == 'refs/heads/prod'
+      # #   run: |
+      # #     echo "${{ secrets.ENV_PROD }}" > .env.prod
+
+      # # - name: Setup Appstore API keys
+      # #   if: github.ref == 'refs/heads/prod'
+      # #   run: |
+      # #     echo "${{ secrets.APPSTORE_API_KEY }}" > ios/Appstore.p8
+
+      # # - name: Create Production Build
+      # #   if: github.ref == 'refs/heads/prod'
+      # #   env:
+      # #     APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
+      # #     APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}
+      # #   run: |
+      # #     cd ios
+      # #     ENVFILE=.env.prod fastlane production
+
+      # # --- ARTIFACT UPLOAD (Backup to download the raw file from GitHub) ---
+      # - name: Stating IPA upload
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: staging-ipa
+      #     path: ios/build/exported/*.ipa
